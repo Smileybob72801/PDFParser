@@ -4,10 +4,12 @@
     {
         public string? Title { get; set; }
         public DateTime DateTime { get; set; }
+		public DateOnly Date {  get; set; }
+		public TimeOnly Time { get; set; }
 
 		public override string ToString()
 		{
-			return $"{Title?.PadRight(30)} | {DateTime,-12:d} | {DateTime,-8:HH:mm}";
+			return $"{Title?.PadRight(30)} | {Date,-12:d} | {Time,-8:HH:mm}";
 		}
 	}
 }

@@ -69,15 +69,17 @@ namespace PDFParser
 					string date = match.Groups["Date"].Value.Trim();
 					string time = match.Groups["Time"].Value.Trim();
 
-					string combinedDateTime = $"{date} {time}";
+					DateOnly.TryParse(date, currentCulture, out DateOnly dateOnly);
+					string normalizedDate = dateOnly.ToString(CultureInfo.InvariantCulture);
 
-					_ = DateTime.TryParse(combinedDateTime, currentCulture, out DateTime dateTime);
-					string invariantDateTime = dateTime.ToString(CultureInfo.InvariantCulture);
+					TimeOnly.TryParse(time, currentCulture, out TimeOnly timeOnly);
+					string normalizedTime = timeOnly.ToString(CultureInfo.InvariantCulture);
 
 					tickets.Add(new TicketInfo
 					{
 						Title = title,
-						DateTime = DateTime.Parse(invariantDateTime)
+						Date = DateOnly.Parse(normalizedDate),
+						Time = TimeOnly.Parse(normalizedTime)
 					});
 				}
 			}
