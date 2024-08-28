@@ -11,7 +11,8 @@ namespace PDFParser.Tickets
 			foreach (TicketInfo ticket in tickets)
 			{
 				sb.AppendLine(ticket.ToString());
-			}
+                Console.WriteLine(ticket);
+            }
 
 			string path = Path.Combine(filePath, fileName);
 

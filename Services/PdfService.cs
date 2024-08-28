@@ -1,14 +1,9 @@
-﻿using PDFParser.FileManagement;
-using PDFParser.Services;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
+﻿using PDFParser.Services;
 using PDFParser.Tickets;
 
 namespace PDFParser
 {
-    internal class PdfService(IPdfReader pdfReader, ITicketParser ticketParser) : IPdfService
+	internal class PdfService(IPdfReader pdfReader, ITicketParser ticketParser) : IPdfService
 	{
 		const string pdfPattern = "*.pdf";
 		private readonly IPdfReader _pdfReader = pdfReader;
@@ -19,103 +14,5 @@ namespace PDFParser
 			List<string> pdfContentsAsStrings = _pdfReader.Read(pdfFilePath, pdfPattern);
 			return _ticketParser.ParseTickets(pdfContentsAsStrings);
 		}
-	}
-
-	internal interface IPdfReader
-	{
-		List<string> Read(string filePath, string pattern);
-	}
-
-	internal class PdfReader(IFileFinder fileFinder) : IPdfReader
-	{
-		private readonly IFileFinder _fileFinder = fileFinder;
-
-		public List<string> Read(string filePath, string pattern)
-		{
-			List<string> result = [];
-
-			foreach (string pdfFilePath in _fileFinder.GetFilePaths(filePath, pattern))
-			{
-				using PdfDocument document = PdfDocument.Open(pdfFilePath);
-
-				foreach (Page page in document.GetPages())
-				{
-					result.Add(page.Text);
-				}
-			}
-
-			return result;
-		}
-	}
-
-	internal interface ITicketParser
-	{
-		List<TicketInfo> ParseTickets(List<string> pdfStrings);
-	}
-
-	internal partial class TicketParser : ITicketParser
-	{
-		public List<TicketInfo> ParseTickets(List<string> pdfStrings)
-		{
-			List<TicketInfo> tickets = [];
-
-			foreach (string pdfString in pdfStrings)
-			{
-				CultureInfo currentCulture = GetCultureFromPdfString(pdfString);
-
-				foreach (Match match in TicketPattern().Matches(pdfString).Cast<Match>())
-				{
-					string title = match.Groups["Title"].Value.Trim();
-					string date = match.Groups["Date"].Value.Trim();
-					string time = match.Groups["Time"].Value.Trim();
-
-					DateOnly.TryParse(date, currentCulture, out DateOnly dateOnly);
-					string normalizedDate = dateOnly.ToString(CultureInfo.InvariantCulture);
-
-					TimeOnly.TryParse(time, currentCulture, out TimeOnly timeOnly);
-					string normalizedTime = timeOnly.ToString(CultureInfo.InvariantCulture);
-
-					tickets.Add(new TicketInfo
-					{
-						Title = title,
-						Date = DateOnly.Parse(normalizedDate),
-						Time = TimeOnly.Parse(normalizedTime)
-					});
-				}
-			}
-
-			return tickets;
-		}
-
-		private static CultureInfo GetCultureFromPdfString(string pdfString)
-		{
-			Match match = UrlPattern().Match(pdfString);
-
-			if (match.Success)
-			{
-				string url = match.Groups[1].Value.Trim();
-
-				if (url.EndsWith(".com"))
-				{
-					return new CultureInfo("en-US");
-				}
-				else if (url.EndsWith(".jp"))
-				{
-					return new CultureInfo("jp-JP");
-				}
-				else if (url.EndsWith(".fr"))
-				{
-					return new CultureInfo("fr-FR");
-				}
-			}
-
-			return CultureInfo.InvariantCulture;
-		}
-
-		[GeneratedRegex(@"Title:(?<Title>.*?)Date:(?<Date>.*?)Time:(?<Time>.*?)(?=Title:|Visit|$)")]
-		private static partial Regex TicketPattern();
-
-		[GeneratedRegex("Visit\\s+us:\\s*(www\\.[^\\s]+)")]
-		private static partial Regex UrlPattern();
 	}
 }
