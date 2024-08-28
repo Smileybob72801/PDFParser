@@ -72,12 +72,12 @@ namespace PDFParser
 					string combinedDateTime = $"{date} {time}";
 
 					_ = DateTime.TryParse(combinedDateTime, currentCulture, out DateTime dateTime);
-					string invariantDate = dateTime.ToString(CultureInfo.InvariantCulture);
+					string invariantDateTime = dateTime.ToString(CultureInfo.InvariantCulture);
 
 					tickets.Add(new TicketInfo
 					{
 						Title = title,
-						DateTime = DateTime.Parse(invariantDate)
+						DateTime = DateTime.Parse(invariantDateTime)
 					});
 				}
 			}
