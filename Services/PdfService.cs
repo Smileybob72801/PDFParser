@@ -8,19 +8,29 @@ using PDFParser.Tickets;
 
 namespace PDFParser
 {
-    internal class PdfService(IFileFinder fileFinder, ITicketParser ticketParser) : IPdfService
+    internal class PdfService(IPdfReader pdfReader, ITicketParser ticketParser) : IPdfService
 	{
 		const string pdfPattern = "*.pdf";
-		private readonly IFileFinder _fileFinder = fileFinder;
+		private readonly IPdfReader _pdfReader = pdfReader;
 		private readonly ITicketParser  _ticketParser = ticketParser;
 
 		public List<TicketInfo> PdfsToTickets(string pdfFilePath)
 		{
-			List<string> pdfContentsAsStrings = PdfToString(pdfFilePath, pdfPattern);
-			return _ticketParser.StringsToTickets(pdfContentsAsStrings);
+			List<string> pdfContentsAsStrings = _pdfReader.Read(pdfFilePath, pdfPattern);
+			return _ticketParser.ParseTickets(pdfContentsAsStrings);
 		}
+	}
 
-		private List<string> PdfToString(string filePath, string pattern)
+	internal interface IPdfReader
+	{
+		List<string> Read(string filePath, string pattern);
+	}
+
+	internal class PdfReader(IFileFinder fileFinder) : IPdfReader
+	{
+		private readonly IFileFinder _fileFinder = fileFinder;
+
+		public List<string> Read(string filePath, string pattern)
 		{
 			List<string> result = [];
 
@@ -40,12 +50,12 @@ namespace PDFParser
 
 	internal interface ITicketParser
 	{
-		List<TicketInfo> StringsToTickets(List<string> pdfStrings);
+		List<TicketInfo> ParseTickets(List<string> pdfStrings);
 	}
 
 	internal partial class TicketParser : ITicketParser
 	{
-		public List<TicketInfo> StringsToTickets(List<string> pdfStrings)
+		public List<TicketInfo> ParseTickets(List<string> pdfStrings)
 		{
 			List<TicketInfo> tickets = [];
 
