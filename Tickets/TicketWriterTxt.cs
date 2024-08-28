@@ -4,7 +4,7 @@ namespace PDFParser.Tickets
 {
 	internal class TicketWriterTxt : ITicketWriter
 	{
-		public void Write(List<TicketInfo> tickets, string filePath)
+		public void Write(List<TicketInfo> tickets, string filePath, string fileName)
 		{
 			StringBuilder sb = new();
 
@@ -13,7 +13,9 @@ namespace PDFParser.Tickets
 				sb.AppendLine(ticket.ToString());
 			}
 
-			File.WriteAllText(filePath, sb.ToString());
+			string path = Path.Combine(filePath, fileName);
+
+			File.WriteAllText(path, sb.ToString());
 		}
 	}
 }

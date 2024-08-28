@@ -15,7 +15,7 @@ namespace PDFParser.App
         {
             List<TicketInfo> ticketInfos = _pdfService.PdfsToTickets(PdfFilePath);
 
-            _ticketWriter.Write(ticketInfos, OutputFilePath);
+            _ticketWriter.Write(ticketInfos, PdfFilePath, OutputFilePath);
 
             Console.ReadKey();
         }

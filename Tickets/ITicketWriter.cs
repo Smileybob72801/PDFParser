@@ -2,6 +2,6 @@
 {
 	internal interface ITicketWriter
 	{
-		void Write(List<TicketInfo> tickets, string filePath);
+		void Write(List<TicketInfo> tickets, string filePath, string fileName);
 	}
 }
