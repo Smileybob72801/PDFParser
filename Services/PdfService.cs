@@ -8,15 +8,16 @@ using PDFParser.Tickets;
 
 namespace PDFParser
 {
-    internal partial class PdfService(IFileFinder fileFinder) : IPdfService
+    internal class PdfService(IFileFinder fileFinder, ITicketParser ticketParser) : IPdfService
 	{
 		const string pdfPattern = "*.pdf";
 		private readonly IFileFinder _fileFinder = fileFinder;
+		private readonly ITicketParser  _ticketParser = ticketParser;
 
 		public List<TicketInfo> PdfsToTickets(string pdfFilePath)
 		{
 			List<string> pdfContentsAsStrings = PdfToString(pdfFilePath, pdfPattern);
-			return StringsToTickets(pdfContentsAsStrings);
+			return _ticketParser.StringsToTickets(pdfContentsAsStrings);
 		}
 
 		private List<string> PdfToString(string filePath, string pattern)
@@ -35,8 +36,16 @@ namespace PDFParser
 
 			return result;
 		}
+	}
 
-		private static List<TicketInfo> StringsToTickets(List<string> pdfStrings)
+	internal interface ITicketParser
+	{
+		List<TicketInfo> StringsToTickets(List<string> pdfStrings);
+	}
+
+	internal partial class TicketParser : ITicketParser
+	{
+		public List<TicketInfo> StringsToTickets(List<string> pdfStrings)
 		{
 			List<TicketInfo> tickets = [];
 

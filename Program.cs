@@ -10,7 +10,8 @@ namespace PDFParser
 		static void Main()
 		{
 			IFileFinder fileFinder = new FileFinder();
-			IPdfService pdfService = new PdfService(fileFinder);
+			ITicketParser ticketParser = new TicketParser();
+			IPdfService pdfService = new PdfService(fileFinder, ticketParser);
 			ITicketWriter ticketWriter = new TicketWriterTxt();
 
 			PdfParserApp app = new(pdfService, ticketWriter);
