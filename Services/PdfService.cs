@@ -42,7 +42,7 @@ namespace PDFParser
 
 			foreach (string pdfString in pdfStrings)
 			{
-				var currentCulture = GetCultureFromPdfString(pdfString);
+				CultureInfo currentCulture = GetCultureFromPdfString(pdfString);
 
 				foreach (Match match in TicketPattern().Matches(pdfString).Cast<Match>())
 				{
