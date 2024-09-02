@@ -20,7 +20,7 @@
 
 Clone the repository:
 ```bash
-git clone https://github.com/YourUsername/PDFParser.git
+git clone https://github.com/Smileybob72801/PDFParser.git
 ```
 
 Navigate to the project directory:
